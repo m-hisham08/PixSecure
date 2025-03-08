@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Image Encryption App</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .form-group {
+        margin-bottom: 15px;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+      }
+      .result-container {
+        margin-top: 20px;
+        border: 1px solid #ddd;
+        padding: 15px;
+        border-radius: 5px;
+      }
+      img {
+        max-width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Image Encryption App</h1>
+
+    <form id="uploadForm" enctype="multipart/form-data">
+      <div class="form-group">
+        <label for="image">Select Image:</label>
+        <input type="file" id="image" name="image" accept="image/*" required />
+      </div>
+
+      <div class="form-group">
+        <label for="edge_algorithm">Edge Detection Algorithm:</label>
+        <select id="edge_algorithm" name="edge_algorithm">
+          <option value="sobel">Sobel</option>
+          <option value="canny">Canny</option>
+          <option value="prewitt">Prewitt</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="encryption_type">Encryption Type:</label>
+        <select id="encryption_type" name="encryption_type">
+          <option value="xor">XOR</option>
+          <option value="aes">AES</option>
+        </select>
+      </div>
+
+      <button type="submit">Encrypt Image</button>
+    </form>
+
+    <div id="result" class="result-container" style="display: none">
+      <h2>Encryption Results</h2>
+
+      <div class="form-group">
+        <label>Encryption Key:</label>
+        <textarea
+          id="encryptionKey"
+          rows="3"
+          style="width: 100%"
+          readonly
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <h3>Encrypted Image:</h3>
+        <img id="encryptedImage" src="" alt="Encrypted Image" />
+      </div>
+
+      <h3>Decrypt Image</h3>
+      <form id="decryptForm">
+        <div class="form-group">
+          <label for="decryptKey">Enter Encryption Key:</label>
+          <textarea
+            id="decryptKey"
+            name="key"
+            rows="3"
+            style="width: 100%"
+            required
+          ></textarea>
+          <input type="hidden" id="encryptedData" name="encrypted_data" />
+          <input type="hidden" id="metadata" name="metadata" />
+          <input
+            type="hidden"
+            id="decryptEncryptionType"
+            name="encryption_type"
+          />
+        </div>
+
+        <button type="submit">Decrypt</button>
+      </form>
+
+      <div id="decryptedResult" style="display: none; margin-top: 20px">
+        <h3>Decrypted Image:</h3>
+        <img id="decryptedImage" src="" alt="Decrypted Image" />
+      </div>
+    </div>
+
+    <script>
+      document
+        .getElementById("uploadForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const formData = new FormData(this);
+
+          fetch("/upload", {
+            method: "POST",
+            body: formData,
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.status === "success") {
+                document.getElementById("result").style.display = "block";
+                document.getElementById("encryptionKey").value = data.key;
+                document.getElementById("decryptKey").value = data.key;
+
+                if (data.encrypted_image) {
+                  document.getElementById("encryptedImage").src =
+                    "data:image/png;base64," + data.encrypted_image;
+                  document.getElementById("encryptedData").value =
+                    data.encrypted_image;
+                }
+
+                if (data.metadata) {
+                  document.getElementById("metadata").value = data.metadata;
+                }
+
+                document.getElementById("decryptEncryptionType").value =
+                  document.getElementById("encryption_type").value;
+              } else {
+                alert("Error: " + data.error);
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              alert("An error occurred during encryption");
+            });
+        });
+
+      document
+        .getElementById("decryptForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const formData = new FormData(this);
+
+          fetch("/decrypt", {
+            method: "POST",
+            body: formData,
+          })
+            .then((response) => {
+              if (!response.ok) {
+                return response.json().then((data) => {
+                  throw new Error(data.error || "Decryption failed");
+                });
+              }
+              return response.blob();
+            })
+            .then((blob) => {
+              const url = URL.createObjectURL(blob);
+              document.getElementById("decryptedImage").src = url;
+              document.getElementById("decryptedResult").style.display =
+                "block";
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              alert("An error occurred during decryption: " + error.message);
+            });
+        });
+    </script>
+  </body>
+</html>
