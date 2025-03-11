@@ -25,6 +25,27 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
+#---------------- Static Methods and Helpers ---------------
+@staticmethod
+def convert_to_native_types(obj):
+    """Convert NumPy types to Python native types for JSON serialization."""
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, np.integer):
+        return int(obj)
+    elif isinstance(obj, np.floating):
+        return float(obj)
+    elif isinstance(obj, dict):
+        return {k: convert_to_native_types(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_to_native_types(i) for i in obj]
+    elif isinstance(obj, np.bool_):  # Handle NumPy boolean type
+        return bool(obj)  
+    elif isinstance(obj, bool):  # Handle Python boolean type
+        return obj  
+    else:
+        return obj
 # --------------- Image Preprocessing Module ---------------
 
 class ImagePreprocessor:
@@ -880,6 +901,7 @@ def upload_image():
 
 @app.route('/decrypt', methods=['POST'])
 def decrypt_image():
+    
     """Handle image decryption."""
     try:
         # Get parameters from request
@@ -949,6 +971,7 @@ def decrypt_image():
 
 @app.route('/validate', methods=['POST'])
 def validate_encryption():
+    
     """Perform security validation on the encryption."""
     try:
         # Get original and encrypted images
@@ -970,11 +993,9 @@ def validate_encryption():
         
         # Perform validation
         results = validator.validate_encryption(original_image, encrypted_image)
-        
-        return jsonify({
-            'status': 'success',
-            'results': results
-        })
+
+        results = convert_to_native_types(results)
+        return jsonify({"status": "success", "results": results})
         
     except Exception as e:
         logger.error(f"Error in validate_encryption: {str(e)}")

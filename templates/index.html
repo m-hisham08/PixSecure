@@ -1,113 +1,773 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>Image Encryption App</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Secure Image Encryption System</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      rel="stylesheet"
+    />
     <style>
+      :root {
+        --primary-color: #3498db;
+        --secondary-color: #2ecc71;
+        --danger-color: #e74c3c;
+        --dark-color: #2c3e50;
+        --light-color: #ecf0f1;
+        --border-radius: 8px;
+        --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
       body {
-        font-family: Arial, sans-serif;
-        max-width: 800px;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f5f7fa;
+        color: #333;
+        line-height: 1.6;
+      }
+
+      .container {
+        max-width: 1100px;
         margin: 0 auto;
         padding: 20px;
       }
-      .form-group {
-        margin-bottom: 15px;
+
+      header {
+        background-color: var(--dark-color);
+        color: white;
+        padding: 1.5rem 0;
+        margin-bottom: 2rem;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
       }
+
+      header .container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .logo i {
+        font-size: 2rem;
+        color: var(--primary-color);
+      }
+
+      h1,
+      h2,
+      h3,
+      h4 {
+        color: var(--dark-color);
+        margin-bottom: 1rem;
+      }
+
+      header h1 {
+        color: white;
+        margin-bottom: 0;
+      }
+
+      .card {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--box-shadow);
+        transition: var(--transition);
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .form-group {
+        margin-bottom: 1.2rem;
+      }
+
       label {
         display: block;
-        margin-bottom: 5px;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: var(--dark-color);
       }
-      .result-container {
-        margin-top: 20px;
+
+      input,
+      select,
+      textarea,
+      button {
+        width: 100%;
+        padding: 0.8rem;
         border: 1px solid #ddd;
-        padding: 15px;
-        border-radius: 5px;
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+        transition: var(--transition);
       }
-      img {
+
+      input:focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+      }
+
+      input[type="file"] {
+        padding: 0.5rem;
+        background-color: #f8f9fa;
+      }
+
+      button {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-weight: bold;
+        transition: var(--transition);
+      }
+
+      button:hover {
+        background-color: #2980b9;
+      }
+
+      button.secondary {
+        background-color: var(--secondary-color);
+      }
+
+      button.secondary:hover {
+        background-color: #27ae60;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+      }
+
+      .full-width {
+        grid-column: span 2;
+      }
+
+      .img-container {
+        border: 2px dashed #ddd;
+        padding: 1rem;
+        border-radius: var(--border-radius);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 250px;
+        position: relative;
+      }
+
+      .img-container img {
         max-width: 100%;
+        max-height: 300px;
+        display: block;
+        border-radius: 4px;
+      }
+
+      .img-container .placeholder {
+        text-align: center;
+        color: #777;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+      }
+
+      .img-container .placeholder i {
+        font-size: 3rem;
+        margin-bottom: 0.5rem;
+        color: #ddd;
+      }
+
+      #preview-container {
+        margin-top: 0.5rem;
+        padding: 0.5rem;
+        display: none;
+      }
+
+      #file-name {
+        font-size: 0.9rem;
+        color: #777;
+        margin-top: 0.5rem;
+      }
+
+      .tabs {
+        display: flex;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .tab {
+        padding: 0.8rem 1.5rem;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        transition: var(--transition);
+      }
+
+      .tab.active {
+        border-bottom: 2px solid var(--primary-color);
+        color: var(--primary-color);
+        font-weight: bold;
+      }
+
+      .tab-content {
+        display: none;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      .key-display {
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-radius: var(--border-radius);
+        font-family: monospace;
+        word-break: break-all;
+        margin-bottom: 1rem;
+        max-height: 100px;
+        overflow-y: auto;
+      }
+
+      .key-controls {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .key-controls button {
+        flex: 1;
+      }
+
+      .security-metrics {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      .metric-card {
+        background-color: #f8f9fa;
+        border-radius: var(--border-radius);
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .metric-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+      }
+
+      .metric-title {
+        font-weight: bold;
+        font-size: 1rem;
+        margin-bottom: 0;
+      }
+
+      .metric-value {
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin: 0.5rem 0;
+      }
+
+      .metric-status {
+        font-size: 0.9rem;
+        padding: 0.3rem 0.6rem;
+        border-radius: 20px;
+        color: white;
+        display: inline-block;
+        text-align: center;
+      }
+
+      .metric-status.pass {
+        background-color: var(--secondary-color);
+      }
+
+      .metric-status.fail {
+        background-color: var(--danger-color);
+      }
+
+      .metric-description {
+        font-size: 0.85rem;
+        color: #777;
+        margin-top: 0.5rem;
+      }
+
+      .progress-container {
+        background-color: #e9ecef;
+        border-radius: 10px;
+        height: 8px;
+        width: 100%;
+        margin: 0.5rem 0;
+      }
+
+      .progress-bar {
+        height: 100%;
+        border-radius: 10px;
+        background-color: var(--primary-color);
+        transition: width 0.5s ease;
+      }
+
+      .validation-summary {
+        margin-top: 1rem;
+        padding: 1rem;
+        border-radius: var(--border-radius);
+        background-color: #f8f9fa;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .validation-score {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: var(--primary-color);
+        min-width: 80px;
+        text-align: center;
+      }
+
+      .validation-info {
+        flex-grow: 1;
+      }
+
+      .validation-info h3 {
+        margin-bottom: 0.5rem;
+      }
+
+      .validation-status {
+        display: inline-block;
+        padding: 0.3rem 0.6rem;
+        border-radius: 20px;
+        color: white;
+        font-weight: bold;
+        font-size: 0.9rem;
+      }
+
+      .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        display: none;
+      }
+
+      .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid rgba(52, 152, 219, 0.2);
+        border-top: 5px solid var(--primary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .alert {
+        padding: 1rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 1rem;
+        color: white;
+        display: none;
+      }
+
+      .alert-success {
+        background-color: var(--secondary-color);
+      }
+
+      .alert-error {
+        background-color: var(--danger-color);
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 768px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        .full-width {
+          grid-column: span 1;
+        }
+
+        .security-metrics {
+          grid-template-columns: 1fr;
+        }
+
+        .validation-summary {
+          flex-direction: column;
+          text-align: center;
+        }
       }
     </style>
   </head>
   <body>
-    <h1>Image Encryption App</h1>
+    <div class="loading-overlay">
+      <div class="spinner"></div>
+    </div>
 
-    <form id="uploadForm" enctype="multipart/form-data">
-      <div class="form-group">
-        <label for="image">Select Image:</label>
-        <input type="file" id="image" name="image" accept="image/*" required />
+    <header>
+      <div class="container">
+        <div class="logo">
+          <i class="fas fa-shield-alt"></i>
+          <h1>Secure Image Encryption System</h1>
+        </div>
+      </div>
+    </header>
+
+    <div class="container">
+      <div id="alert" class="alert"></div>
+
+      <div class="card">
+        <h2><i class="fas fa-upload"></i> Upload & Encrypt Image</h2>
+        <form id="uploadForm" enctype="multipart/form-data">
+          <div class="grid">
+            <div class="form-group">
+              <label for="image">Select Image:</label>
+              <input
+                type="file"
+                id="image"
+                name="image"
+                accept="image/*"
+                required
+              />
+              <div id="file-name"></div>
+            </div>
+
+            <div class="form-group">
+              <label>Image Preview:</label>
+              <div class="img-container">
+                <div id="preview-placeholder" class="placeholder">
+                  <i class="fas fa-image"></i>
+                  <p>No image selected</p>
+                </div>
+                <div id="preview-container">
+                  <img id="preview-image" src="" alt="Preview" />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="edge_algorithm">Edge Detection Algorithm:</label>
+              <select id="edge_algorithm" name="edge_algorithm">
+                <option value="sobel">Sobel</option>
+                <option value="canny">Canny</option>
+                <option value="prewitt">Prewitt</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="encryption_type">Encryption Type:</label>
+              <select id="encryption_type" name="encryption_type">
+                <option value="xor">XOR (Faster)</option>
+                <option value="aes">AES (More Secure)</option>
+              </select>
+            </div>
+
+            <div class="form-group full-width">
+              <button type="submit">
+                <i class="fas fa-lock"></i> Encrypt Image
+              </button>
+            </div>
+          </div>
+        </form>
       </div>
 
-      <div class="form-group">
-        <label for="edge_algorithm">Edge Detection Algorithm:</label>
-        <select id="edge_algorithm" name="edge_algorithm">
-          <option value="sobel">Sobel</option>
-          <option value="canny">Canny</option>
-          <option value="prewitt">Prewitt</option>
-        </select>
-      </div>
+      <div id="result" class="card" style="display: none">
+        <h2><i class="fas fa-key"></i> Encryption Results</h2>
 
-      <div class="form-group">
-        <label for="encryption_type">Encryption Type:</label>
-        <select id="encryption_type" name="encryption_type">
-          <option value="xor">XOR</option>
-          <option value="aes">AES</option>
-        </select>
-      </div>
-
-      <button type="submit">Encrypt Image</button>
-    </form>
-
-    <div id="result" class="result-container" style="display: none">
-      <h2>Encryption Results</h2>
-
-      <div class="form-group">
-        <label>Encryption Key:</label>
-        <textarea
-          id="encryptionKey"
-          rows="3"
-          style="width: 100%"
-          readonly
-        ></textarea>
-      </div>
-
-      <div class="form-group">
-        <h3>Encrypted Image:</h3>
-        <img id="encryptedImage" src="" alt="Encrypted Image" />
-      </div>
-
-      <h3>Decrypt Image</h3>
-      <form id="decryptForm">
-        <div class="form-group">
-          <label for="decryptKey">Enter Encryption Key:</label>
-          <textarea
-            id="decryptKey"
-            name="key"
-            rows="3"
-            style="width: 100%"
-            required
-          ></textarea>
-          <input type="hidden" id="encryptedData" name="encrypted_data" />
-          <input type="hidden" id="metadata" name="metadata" />
-          <input
-            type="hidden"
-            id="decryptEncryptionType"
-            name="encryption_type"
-          />
+        <div class="tabs">
+          <div class="tab active" data-tab="encrypted">Encrypted Image</div>
+          <div class="tab" data-tab="decrypt">Decrypt Image</div>
+          <div class="tab" data-tab="validation">Security Validation</div>
         </div>
 
-        <button type="submit">Decrypt</button>
-      </form>
+        <div id="encrypted-tab" class="tab-content active">
+          <h3>Encryption Key</h3>
+          <div class="form-group">
+            <div class="key-display" id="encryptionKey"></div>
+            <div class="key-controls">
+              <button id="copyKeyBtn" class="secondary">
+                <i class="fas fa-copy"></i> Copy Key
+              </button>
+            </div>
+          </div>
 
-      <div id="decryptedResult" style="display: none; margin-top: 20px">
-        <h3>Decrypted Image:</h3>
-        <img id="decryptedImage" src="" alt="Decrypted Image" />
+          <h3>Encrypted Image</h3>
+          <div class="img-container">
+            <img id="encryptedImage" src="" alt="Encrypted Image" />
+          </div>
+        </div>
+
+        <div id="decrypt-tab" class="tab-content">
+          <form id="decryptForm">
+            <div class="form-group">
+              <label for="decryptKey">Enter Encryption Key:</label>
+              <textarea id="decryptKey" name="key" rows="3" required></textarea>
+              <input type="hidden" id="encryptedData" name="encrypted_data" />
+              <input type="hidden" id="metadata" name="metadata" />
+              <input
+                type="hidden"
+                id="decryptEncryptionType"
+                name="encryption_type"
+              />
+            </div>
+
+            <div class="form-group">
+              <button type="submit">
+                <i class="fas fa-unlock"></i> Decrypt Image
+              </button>
+            </div>
+          </form>
+
+          <div id="decryptedResult" style="display: none; margin-top: 20px">
+            <h3>Decrypted Image</h3>
+            <div class="img-container">
+              <img id="decryptedImage" src="" alt="Decrypted Image" />
+            </div>
+          </div>
+        </div>
+
+        <div id="validation-tab" class="tab-content">
+          <div class="form-group">
+            <button id="validateBtn" class="secondary">
+              <i class="fas fa-check-circle"></i> Run Security Validation
+            </button>
+          </div>
+
+          <div id="validation-results" style="display: none">
+            <div class="validation-summary" id="validation-summary">
+              <div class="validation-score" id="overall-score">-</div>
+              <div class="validation-info">
+                <h3>Overall Security Assessment</h3>
+                <p>
+                  Comprehensive evaluation based on entropy, correlation, and
+                  histogram analysis
+                </p>
+                <span id="overall-status" class="validation-status"
+                  >Pending</span
+                >
+              </div>
+            </div>
+
+            <h3>Detailed Security Metrics</h3>
+            <div class="security-metrics">
+              <div class="metric-card">
+                <div class="metric-header">
+                  <div class="metric-title">Entropy Analysis</div>
+                  <span id="entropy-status" class="metric-status">Pending</span>
+                </div>
+                <div class="metric-value" id="entropy-value">-</div>
+                <div class="progress-container">
+                  <div
+                    class="progress-bar"
+                    id="entropy-progress"
+                    style="width: 0%"
+                  ></div>
+                </div>
+                <div class="metric-description">
+                  Measures the randomness of pixel values. Higher values
+                  indicate better encryption. Good encryption typically has
+                  entropy > 7.5 bits.
+                </div>
+              </div>
+
+              <div class="metric-card">
+                <div class="metric-header">
+                  <div class="metric-title">Correlation Analysis</div>
+                  <span id="correlation-status" class="metric-status"
+                    >Pending</span
+                  >
+                </div>
+                <div class="metric-value" id="correlation-value">-</div>
+                <div class="progress-container">
+                  <div
+                    class="progress-bar"
+                    id="correlation-progress"
+                    style="width: 0%"
+                  ></div>
+                </div>
+                <div class="metric-description">
+                  Measures the relationship between adjacent pixels. Lower
+                  values indicate better encryption. Good encryption has
+                  correlation coefficients close to zero.
+                </div>
+              </div>
+
+              <div class="metric-card">
+                <div class="metric-header">
+                  <div class="metric-title">Histogram Uniformity</div>
+                  <span id="histogram-status" class="metric-status"
+                    >Pending</span
+                  >
+                </div>
+                <div class="metric-value" id="histogram-value">-</div>
+                <div class="progress-container">
+                  <div
+                    class="progress-bar"
+                    id="histogram-progress"
+                    style="width: 0%"
+                  ></div>
+                </div>
+                <div class="metric-description">
+                  Measures how evenly distributed the pixel values are. A
+                  uniform histogram indicates better resistance to statistical
+                  attacks.
+                </div>
+              </div>
+
+              <div class="metric-card">
+                <div class="metric-header">
+                  <div class="metric-title">Chi-Square Test</div>
+                  <span id="chi-square-status" class="metric-status"
+                    >Pending</span
+                  >
+                </div>
+                <div class="metric-value" id="chi-square-value">-</div>
+                <div class="progress-container">
+                  <div
+                    class="progress-bar"
+                    id="chi-square-progress"
+                    style="width: 0%"
+                  ></div>
+                </div>
+                <div class="metric-description">
+                  Statistical test measuring how well the histogram matches a
+                  uniform distribution. Lower values indicate better randomness.
+                </div>
+              </div>
+
+              <div class="metric-card full-width">
+                <div class="metric-header">
+                  <div class="metric-title">Correlation Coefficients</div>
+                </div>
+                <div
+                  style="
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 1rem;
+                    margin-top: 0.5rem;
+                  "
+                >
+                  <div>
+                    <p>
+                      <strong>Horizontal:</strong>
+                      <span id="correlation-h">-</span>
+                    </p>
+                  </div>
+                  <div>
+                    <p>
+                      <strong>Vertical:</strong>
+                      <span id="correlation-v">-</span>
+                    </p>
+                  </div>
+                  <div>
+                    <p>
+                      <strong>Diagonal:</strong>
+                      <span id="correlation-d">-</span>
+                    </p>
+                  </div>
+                </div>
+                <div class="metric-description">
+                  Detailed correlation between adjacent pixels in different
+                  directions. Values close to 0 indicate that the encrypted
+                  image doesn't retain patterns from the original.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
     <script>
+      // Image preview
+      document.getElementById("image").addEventListener("change", function (e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            document.getElementById("preview-image").src = event.target.result;
+            document.getElementById("preview-placeholder").style.display =
+              "none";
+            document.getElementById("preview-container").style.display =
+              "block";
+            document.getElementById("file-name").textContent = file.name;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // Tabs functionality
+      document.querySelectorAll(".tab").forEach((tab) => {
+        tab.addEventListener("click", function () {
+          // Remove active class from all tabs
+          document
+            .querySelectorAll(".tab")
+            .forEach((t) => t.classList.remove("active"));
+          document
+            .querySelectorAll(".tab-content")
+            .forEach((c) => c.classList.remove("active"));
+
+          // Add active class to current tab
+          this.classList.add("active");
+          const tabId = this.getAttribute("data-tab");
+          document.getElementById(tabId + "-tab").classList.add("active");
+        });
+      });
+
+      // Copy key to clipboard
+      document
+        .getElementById("copyKeyBtn")
+        .addEventListener("click", function () {
+          const keyText = document.getElementById("encryptionKey").textContent;
+          navigator.clipboard
+            .writeText(keyText)
+            .then(() => {
+              showAlert("Key copied to clipboard!", "success");
+            })
+            .catch((err) => {
+              console.error("Failed to copy text: ", err);
+              showAlert("Failed to copy key", "error");
+            });
+        });
+
+      // Upload form submission
       document
         .getElementById("uploadForm")
         .addEventListener("submit", function (e) {
           e.preventDefault();
+          showLoading(true);
 
           const formData = new FormData(this);
 
@@ -117,9 +777,11 @@
           })
             .then((response) => response.json())
             .then((data) => {
+              showLoading(false);
+
               if (data.status === "success") {
                 document.getElementById("result").style.display = "block";
-                document.getElementById("encryptionKey").value = data.key;
+                document.getElementById("encryptionKey").textContent = data.key;
                 document.getElementById("decryptKey").value = data.key;
 
                 if (data.encrypted_image) {
@@ -135,20 +797,34 @@
 
                 document.getElementById("decryptEncryptionType").value =
                   document.getElementById("encryption_type").value;
+
+                // Reset validation tab
+                document.getElementById("validation-results").style.display =
+                  "none";
+
+                showAlert("Image encrypted successfully!", "success");
+
+                // Scroll to results
+                document
+                  .getElementById("result")
+                  .scrollIntoView({ behavior: "smooth" });
               } else {
-                alert("Error: " + data.error);
+                showAlert("Error: " + data.error, "error");
               }
             })
             .catch((error) => {
+              showLoading(false);
               console.error("Error:", error);
-              alert("An error occurred during encryption");
+              showAlert("An error occurred during encryption", "error");
             });
         });
 
+      // Decrypt form submission
       document
         .getElementById("decryptForm")
         .addEventListener("submit", function (e) {
           e.preventDefault();
+          showLoading(true);
 
           const formData = new FormData(this);
 
@@ -165,16 +841,218 @@
               return response.blob();
             })
             .then((blob) => {
+              showLoading(false);
               const url = URL.createObjectURL(blob);
               document.getElementById("decryptedImage").src = url;
               document.getElementById("decryptedResult").style.display =
                 "block";
+              showAlert("Image decrypted successfully!", "success");
             })
             .catch((error) => {
+              showLoading(false);
               console.error("Error:", error);
-              alert("An error occurred during decryption: " + error.message);
+              showAlert(
+                "An error occurred during decryption: " + error.message,
+                "error"
+              );
             });
         });
+
+      // Security validation
+      document
+        .getElementById("validateBtn")
+        .addEventListener("click", function () {
+          const encryptedImage = document.getElementById("encryptedData").value;
+
+          if (!encryptedImage) {
+            showAlert("No encrypted image available for validation", "error");
+            return;
+          }
+
+          showLoading(true);
+
+          // We need both the original and encrypted images for validation
+          // Since we already have the original image preview, we can use that
+          const originalImage = document
+            .getElementById("preview-image")
+            .src.split(",")[1];
+
+          const formData = new FormData();
+          formData.append("original_image", originalImage);
+          formData.append("encrypted_image", encryptedImage);
+
+          fetch("/validate", {
+            method: "POST",
+            body: formData,
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              showLoading(false);
+
+              if (data.status === "success") {
+                displayValidationResults(data.results);
+                document.getElementById("validation-results").style.display =
+                  "block";
+                showAlert("Security validation completed!", "success");
+              } else {
+                showAlert("Error: " + data.error, "error");
+              }
+            })
+            .catch((error) => {
+              showLoading(false);
+              console.error("Error:", error);
+              showAlert(
+                "An error occurred during security validation",
+                "error"
+              );
+            });
+        });
+
+      // Display validation results
+      function displayValidationResults(results) {
+        // Overall score
+        const score = results.security_score.toFixed(2);
+        document.getElementById("overall-score").textContent = score;
+
+        // Overall status
+        const overallStatus = document.getElementById("overall-status");
+        if (score >= 7.5) {
+          overallStatus.textContent = "Secure";
+          overallStatus.className = "validation-status pass";
+          document.getElementById("validation-summary").style.backgroundColor =
+            "#e8f7f0";
+        } else {
+          overallStatus.textContent = "Weak";
+          overallStatus.className = "validation-status fail";
+          document.getElementById("validation-summary").style.backgroundColor =
+            "#f9ebea";
+        }
+
+        // Entropy
+        const entropy = results.entropy.encrypted.toFixed(2);
+        document.getElementById("entropy-value").textContent = entropy;
+        const entropyProgress = Math.min(100, (entropy / 8) * 100);
+        document.getElementById("entropy-progress").style.width =
+          entropyProgress + "%";
+
+        const entropyStatus = document.getElementById("entropy-status");
+        if (entropy > 7.5) {
+          entropyStatus.textContent = "Pass";
+          entropyStatus.className = "metric-status pass";
+        } else {
+          entropyStatus.textContent = "Fail";
+          entropyStatus.className = "metric-status fail";
+        }
+
+        // Correlation
+        const correlationH = Math.abs(
+          results.correlation.encrypted.horizontal
+        ).toFixed(4);
+        const correlationV = Math.abs(
+          results.correlation.encrypted.vertical
+        ).toFixed(4);
+        const correlationD = Math.abs(
+          results.correlation.encrypted.diagonal
+        ).toFixed(4);
+
+        document.getElementById("correlation-h").textContent = correlationH;
+        document.getElementById("correlation-v").textContent = correlationV;
+        document.getElementById("correlation-d").textContent = correlationD;
+
+        const maxCorr = Math.max(
+          Math.abs(results.correlation.encrypted.horizontal),
+          Math.abs(results.correlation.encrypted.vertical),
+          Math.abs(results.correlation.encrypted.diagonal)
+        );
+
+        document.getElementById("correlation-value").textContent =
+          maxCorr.toFixed(4);
+        const corrProgress = Math.min(100, (1 - maxCorr) * 100);
+        document.getElementById("correlation-progress").style.width =
+          corrProgress + "%";
+
+        const corrStatus = document.getElementById("correlation-status");
+        if (maxCorr < 0.1) {
+          corrStatus.textContent = "Pass";
+          corrStatus.className = "metric-status pass";
+        } else {
+          corrStatus.textContent = "Fail";
+          corrStatus.className = "metric-status fail";
+        }
+
+        // Histogram uniformity
+        const origVar = results.histogram.original_uniformity;
+        const encVar = results.histogram.encrypted_uniformity;
+        const ratio = encVar / origVar;
+        const uniformityImprovement = (1 - ratio) * 100;
+
+        document.getElementById("histogram-value").textContent =
+          uniformityImprovement.toFixed(2) + "%";
+        const histProgress = Math.min(100, uniformityImprovement);
+        document.getElementById("histogram-progress").style.width =
+          histProgress + "%";
+
+        const histStatus = document.getElementById("histogram-status");
+        if (ratio < 0.1) {
+          histStatus.textContent = "Pass";
+          histStatus.className = "metric-status pass";
+        } else {
+          histStatus.textContent = "Fail";
+          histStatus.className = "metric-status fail";
+        }
+
+        const chiSquare = results.histogram.chi_square;
+        const normalizedChi = Math.min(10000, chiSquare) / 10000;
+        document.getElementById("chi-square-value").textContent =
+          chiSquare.toFixed(2);
+        const chiProgress = Math.max(0, 100 - normalizedChi * 100);
+        document.getElementById("chi-square-progress").style.width =
+          chiProgress + "%";
+
+        const chiStatus = document.getElementById("chi-square-status");
+        if (chiSquare < 1000) {
+          chiStatus.textContent = "Pass";
+          chiStatus.className = "metric-status pass";
+        } else {
+          chiStatus.textContent = "Fail";
+          chiStatus.className = "metric-status fail";
+        }
+      }
+
+      // Helper function to show/hide loading spinner
+      function showLoading(show) {
+        const loadingOverlay = document.querySelector(".loading-overlay");
+        if (show) {
+          loadingOverlay.style.display = "flex";
+        } else {
+          loadingOverlay.style.display = "none";
+        }
+      }
+
+      // Helper function to show alerts
+      function showAlert(message, type) {
+        const alert = document.getElementById("alert");
+        alert.textContent = message;
+        alert.className = "alert alert-" + type;
+        alert.style.display = "block";
+
+        // Auto hide after 5 seconds
+        setTimeout(() => {
+          alert.style.display = "none";
+        }, 5000);
+      }
+
+      // Initialize page
+      document.addEventListener("DOMContentLoaded", function () {
+        // Reset forms and UI elements
+        document.getElementById("uploadForm").reset();
+        document.getElementById("decryptForm").reset();
+        document.getElementById("result").style.display = "none";
+        document.getElementById("preview-placeholder").style.display = "block";
+        document.getElementById("preview-container").style.display = "none";
+        document.getElementById("decryptedResult").style.display = "none";
+        document.getElementById("validation-results").style.display = "none";
+      });
     </script>
   </body>
 </html>
